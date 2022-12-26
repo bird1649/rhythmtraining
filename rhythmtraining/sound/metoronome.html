@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang='ja'>
+
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='user-scalable=no,width=device-width,initial-scale=1'>
+    <title>metronome</title>
+    <style>
+        #container {
+            position: relative;
+            box-sizing: border-box;
+            left: 0;
+            width: 100%;
+            height: 360px;
+            padding: 100px auto;
+            background-color: darkgoldenrod;
+        }
+
+        input[type=number] {
+            width: 30px;
+            margin-right: 20px;
+        }
+
+        #st {
+            position: absolute;
+            box-sizing: border-box;
+            top: 70%;
+            left: 48%;
+            width: 4%;
+            height: 70%;
+            border: 0px solid #444;
+            background-color: rgb(249, 243, 123);
+            border-radius: 3px;
+            transform: rotate(0deg) translateY(-55%);
+        }
+
+        #sg {
+            position: absolute;
+            right: 10px;
+            bottom: 0;
+        }
+
+        #sg [id*=sg] {
+            position: relative;
+            display: inline-block;
+            border: 0px solid gray;
+            border-radius: 20%;
+            width: 50px;
+            height: 50px;
+        }
+
+        .control {
+            position: fixed;
+            top: 10px;
+            left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='container'>
+        <div id='st'></div>
+        <div id='sg'>
+            <div id='sg0'></div>
+            <div id='sg1'></div>
+        </div>
+    </div>
+    <div class='control'>
+        <div id='control'>
+            TIMING: <input type='range' id='adjust' min='0' max='1' value='0.5' step='0.025'><br>
+            BEATS: <span id='vb'>0</span> <input type='range' min='0' max='8' value='0' id='beat'><br>
+            TEMPO: <input type='number' min='10' max='800' value='60' id='tempo' oninput='tn.value=this.value'>BPM
+            <select id='tn'></select><br>
+            <button id='s'>START</button><br>
+        </div>
+        <button onclick='sh(this)'>△</button>
+    </div>
+
+    <script>
+        'use strict';
+        const btn = document.getElementById('s');
+        const st = document.getElementById('st');
+        const tempo = document.getElementById('tempo');
+        const adjust = document.getElementById('adjust');
+        const beat = document.getElementById('beat');
+        const tn = document.getElementById('tn');
+        const sa = 35;
+
+        let start = 0;
+        let status = 0;
+        let _count = 0;
+
+        btn.addEventListener('click', () => {
+            se('blank');
+            start = Date.now();
+            if (status) status = 0;
+            else {
+                status = 1;
+                loop();
+            }
+            btn.textContent = ['START', 'STOP'][status];
+        });
+
+        function loop() {
+            const t = status ? (Date.now() - start) / 60000 : 0;
+            const r = Math.sin(t * tempo.value * Math.PI) * sa;
+            st.style.transform = `rotate(${r}deg) translateY(-55%)`;
+            const count = Math.floor(t * tempo.value + +adjust.value);
+            if (count !== _count) {
+                _count = count;
+                blink('sg1', '#8cf');
+                se('click');
+                if (beat.value > 0 && (count - 1) % beat.value === 0) {
+                    blink('sg0', '#48f');
+                    se('bell');
+                }
+            }
+            if (status) requestAnimationFrame(loop);
+        }
+
+        function blink(id, color) {
+            const d = document.getElementById(id);
+            d.style.backgroundColor = color;
+            setTimeout(() => {
+                d.style.backgroundColor = '';
+            }, 100);
+        }
+
+        beat.addEventListener('input', () => {
+            document.getElementById('vb').textContent = beat.value;
+        });
+
+        function sh(e) {
+            const d = document.getElementById('control');
+            if (d.dataset.hide === undefined) {
+                d.dataset.hide = true;
+                d.style.display = 'none';
+                e.textContent = '▽';
+            }
+            else {
+                delete d.dataset.hide;
+                d.style.display = 'block';
+                e.textContent = '△';
+            }
+        }
+
+        const seList = {
+            'click': './click.mp3',
+            'bell': './bell.mp3',
+            'blank': './blank.mp3',
+        };
+        const seElements = {};
+
+        let context;
+        let webSoundApiFlg = 0;
+
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (window.AudioContext !== undefined) {
+            context = new AudioContext();
+        }
+
+        const getAudioBuffer = (url, fn) => {
+            const req = new XMLHttpRequest();
+            req.responseType = 'arraybuffer';
+            req.onreadystatechange = () => {
+                if (req.readyState === 4) {
+                    if (req.status === 0 || req.status === 200) {
+                        context.decodeAudioData(req.response, buffer => {
+                            fn(buffer);
+                        });
+                    }
+                }
+            };
+            req.open('GET', url, true);
+            req.send('');
+        };
+
+        const playSound = buffer => {
+            const source = context.createBufferSource();
+            source.buffer = buffer;
+            source.connect(context.destination);
+            source.start(0);
+        };
+
+        function waOnload() {
+            if (context !== undefined) {
+                for (let i in seList) {
+                    getAudioBuffer(seList[i], buffer => {
+                        const bufId = i;
+                        document.querySelector('body').appendChild(document.createElement('div'));
+                        document.querySelector('body>div:last-of-type').id = bufId;
+                        seElements[bufId] = document.getElementById(bufId);
+                        seElements[bufId].onclick = () => {
+                            playSound(buffer);
+                        };
+                    });
+                }
+                webSoundApiFlg = 1;
+            }
+        }
+        window.addEventListener('load', waOnload);
+
+        if (window.AudioContext === undefined) {
+            for (let i in seList) {
+                document.querySelector('body').insertAdjacentHTML('beforeend',
+                    '<audio id="' + i + '" preload="auto">' +
+                    '   <source src="' + seList[i] + '" type="audio/mp3">' +
+                    '</audio>'
+                );
+                seElements[i] = document.getElementById(i);
+            }
+        }
+
+        function se(id) {
+            const d = seElements[id];
+            if (webSoundApiFlg) {
+                d.onclick();
+            }
+            else {
+                if (id) {
+                    if (d.currentTime != 0 || !d.paused) {
+                        d.pause();
+                        d.currentTime = 0;
+                    }
+                    d.play();
+                }
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const l = [
+                [40, 'Grave'],
+                [46, 'Largo'],
+                [52, 'Lento'],
+                [58, 'Adagio'],
+                [60, 'Larghetto'],
+                [66, 'Andante'],
+                [76, 'Andantino'],
+                [84, 'Moderato'],
+                [108, 'Allegretto'],
+                [120, "All'o Moderato"],
+                [132, 'Allegro'],
+                [144, "All'o Assai"],
+                [152, "All'o Vivace"],
+                [160, 'Vivace'],
+                [184, 'Presto'],
+                [200, 'Prestissimo'],
+            ];
+            for (const i of l) tn.insertAdjacentHTML('beforeend', `<option value='${i[0]}'>${i[0]} : ${i[1]}</option>`);
+            tn.value = tempo.value;
+            tn.addEventListener('change', () => {
+                tempo.value = tn.value;
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="frame">
+            <p></p>
+            <div id="target1"><img src="img/1beat/1-1.png" alt="" width="100vw" /></div>
+            <div id="target2"><img src="img/1beat/1-1.png" alt="" width="100vw" /></div>
+            <div id="target3"><img src="img/1beat/1-1.png" alt="" width="100vw" /></div>
+            <div id="target4"><img src="img/1beat/1-1.png" alt="" width="100vw" /></div>
+            <p></p>
+            <div id="target5"><img src="img/1beat/1-1.png" alt="" width="100vw" /></div>
+            <div id="target5"><img src="img/1beat/r1-1.png" alt="" width="100vw" /></div>
+            <div id="target5"><img src="img/1beat/r1-1.png" alt="" width="100vw" /></div>
+            <div id="target5"><img src="img/1beat/r1-1.png" alt="" width="100vw" /></div>
+            <p></p>
+        </div>
+        <input type="button" value="リズムを変える" id="bt" />
+
+        <script language="javascript" type="text/javascript">
+            var target = document.getElementById('target');
+            var bt = document.getElementById('bt');
+            bt.addEventListener('click', function (e) {
+                var imglist = [
+                    "img/1beat/1-1.png",
+                    "img/1beat/1-2.png",
+                    "img/1beat/1-3.png",
+                    "img/1beat/1-4.png",
+                    "img/1beat/1-5.png",
+                    "img/1beat/1-6.png",
+                    "img/1beat/1-7.png"
+                ];
+                var selectnum = Math.floor(Math.random() * imglist.length);
+                var element = '<img src="' + imglist[selectnum] + '" alt="" width="100vw" />';
+                target1.innerHTML = element;
+            }, false);
+
+            var target2 = document.getElementById('target2');
+            var bt = document.getElementById('bt');
+            bt.addEventListener('click', function (e) {
+                var imglist = [
+                    "img/1beat/1-1.png",
+                    "img/1beat/1-2.png",
+                    "img/1beat/1-3.png",
+                    "img/1beat/1-4.png",
+                    "img/1beat/1-5.png",
+                    "img/1beat/1-6.png",
+                    "img/1beat/1-7.png"
+                ];
+                var selectnum = Math.floor(Math.random() * imglist.length);
+                var element = '<img src="' + imglist[selectnum] + '" alt="" width="100vw" />';
+                target2.innerHTML = element;
+            }, false);
+
+
+            var target3 = document.getElementById('target3');
+            var bt = document.getElementById('bt');
+            bt.addEventListener('click', function (e) {
+                var imglist = [
+                    "img/1beat/1-1.png",
+                    "img/1beat/1-2.png",
+                    "img/1beat/1-3.png",
+                    "img/1beat/1-4.png",
+                    "img/1beat/1-5.png",
+                    "img/1beat/1-6.png",
+                    "img/1beat/1-7.png"
+                ];
+                var selectnum = Math.floor(Math.random() * imglist.length);
+                var element = '<img src="' + imglist[selectnum] + '" alt="" width="100vw"/>';
+                target3.innerHTML = element;
+            }, false);
+
+
+
+            var target4 = document.getElementById('target4');
+            var bt = document.getElementById('bt');
+            bt.addEventListener('click', function (e) {
+                var imglist = [
+                    "img/1beat/1-1.png",
+                    "img/1beat/1-2.png",
+                    "img/1beat/1-3.png",
+                    "img/1beat/1-4.png",
+                    "img/1beat/1-5.png",
+                    "img/1beat/1-6.png",
+                    "img/1beat/1-7.png"
+                ];
+                var selectnum = Math.floor(Math.random() * imglist.length);
+                var element = '<img src="' + imglist[selectnum] + '" alt="" width="100vw" />';
+                target4.innerHTML = element;
+            }, false);
+
+
+        </script>
+
+    </div>
+    <div class="container2">
+        <iframe src="sound/metoronome.html" align="center"></iframe>
+
+    </div>
+
+
+</body>
+
+</html>

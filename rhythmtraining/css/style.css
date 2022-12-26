@@ -1,0 +1,33 @@
+@charset "UTF-8";
+
+.container,
+.container2 {
+    width: 100%;
+    text-align: center;
+
+}
+
+.frame>p {
+    border-left: 2px solid #000000;
+    /*線の設定*/
+    padding: 2px 8px;
+    /*余白の設定*/
+}
+
+.frame {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0px;
+}
+
+.frame>img {
+    margin: 20px 0px;
+}
+
+.container2>iframe {
+    border: none;
+    width: 40%;
+    margin-top: 50px;
+    height: 400px;
+    overflow: visible;
+}
